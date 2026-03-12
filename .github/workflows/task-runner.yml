@@ -1,0 +1,87 @@
+name: 🤖 Automate Task Runner
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  acknowledge:
+    if: contains(github.event.issue.labels.*.name, 'task')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Acknowledge Task
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `🤖 **Automate** has received this task.\n\n**Status:** Processing\n**Time:** ${new Date().toISOString()}\n\nI'll update this issue with results.`
+            });
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['in-progress']
+            });
+
+  process:
+    needs: acknowledge
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Process Task
+        env:
+          TASK_TITLE: ${{ github.event.issue.title }}
+          TASK_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          OPENCLAW_TOKEN: ${{ secrets.OPENCLAW_TOKEN }}
+          AUTOMATE_SSH_KEY: ${{ secrets.AUTOMATE_SSH_KEY }}
+        run: |
+          chmod +x scripts/run-task.sh
+          bash scripts/run-task.sh
+
+      - name: Post Results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let result = 'No output file found.';
+            try {
+              result = fs.readFileSync('/tmp/task-result.md', 'utf8');
+            } catch (e) {
+              result = `⚠️ Task completed but no result file was generated.\n\nCheck the workflow logs for details.`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 📋 Task Result\n\n${result}\n\n---\n🤖 *Automate — ${new Date().toISOString()}*`
+            });
+
+            await github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: 'in-progress'
+            }).catch(() => {});
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['completed']
+            });

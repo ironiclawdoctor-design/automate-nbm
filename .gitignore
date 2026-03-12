@@ -1,0 +1,16 @@
+# Secrets - NEVER commit these
+*.pem
+*.key
+.env
+.env.*
+
+# Temp
+/tmp/
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

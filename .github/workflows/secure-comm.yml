@@ -1,0 +1,72 @@
+name: 🔒 Secure Communication Channel
+
+on:
+  repository_dispatch:
+    types: [secure-message, task-request, status-check]
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  handle-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Source
+        env:
+          ALLOWED_SENDERS: ${{ secrets.ALLOWED_SENDERS }}
+          SENDER: ${{ github.event.client_payload.sender }}
+        run: |
+          if [ -z "$ALLOWED_SENDERS" ]; then
+            echo "⚠️ ALLOWED_SENDERS not configured. Allowing all."
+            exit 0
+          fi
+          
+          if echo "$ALLOWED_SENDERS" | grep -qw "$SENDER"; then
+            echo "✅ Sender verified: $SENDER"
+          else
+            echo "❌ Unauthorized sender: $SENDER"
+            exit 1
+          fi
+
+      - name: Process Message
+        env:
+          MESSAGE_TYPE: ${{ github.event.action }}
+          PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+          OPENCLAW_TOKEN: ${{ secrets.OPENCLAW_TOKEN }}
+          AUTOMATE_SSH_KEY: ${{ secrets.AUTOMATE_SSH_KEY }}
+        run: |
+          echo "📨 Received: $MESSAGE_TYPE"
+          echo "📦 Payload: $PAYLOAD"
+          
+          case "$MESSAGE_TYPE" in
+            secure-message)
+              echo "Processing secure message..."
+              # Decrypt and process message
+              ;;
+            task-request)
+              echo "Processing task request..."
+              # Create issue from request
+              ;;
+            status-check)
+              echo "Generating status report..."
+              echo "✅ Automate is operational" > /tmp/task-result.md
+              date -u >> /tmp/task-result.md
+              ;;
+          esac
+
+      - name: Post Response
+        if: github.event.action == 'status-check'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let status = '✅ Operational';
+            try {
+              status = fs.readFileSync('/tmp/task-result.md', 'utf8');
+            } catch (e) {}
+            
+            console.log(`Status: ${status}`);

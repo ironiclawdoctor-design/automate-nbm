@@ -1,0 +1,50 @@
+# Automate Agent Configuration
+# ================================
+
+agent:
+  name: Automate
+  version: 1.0.0
+  description: Persistent subagent for secure task automation
+
+# Communication channels
+channels:
+  github:
+    enabled: true
+    issue_labels: [task, automation]
+    auto_acknowledge: true
+  
+  webhook:
+    enabled: false
+    url: ""  # Set via WEBHOOK_URL secret
+  
+  ssh:
+    enabled: true
+    # Key managed via GitHub Secrets (AUTOMATE_SSH_KEY)
+
+# Task settings
+tasks:
+  max_concurrent: 3
+  timeout_minutes: 30
+  auto_close_completed: false
+  
+  priorities:
+    high:
+      label: "priority:high"
+      timeout_minutes: 10
+    medium:
+      label: "priority:medium"
+      timeout_minutes: 30
+    low:
+      label: "priority:low"
+      timeout_minutes: 60
+
+# Security
+security:
+  require_sender_validation: true
+  # ALLOWED_SENDERS set via GitHub Secrets
+  audit_log: true
+  
+# Schedule (for scheduled.yml)
+schedule:
+  health_check: "0 */6 * * *"    # Every 6 hours
+  cleanup: "0 0 * * 0"            # Weekly Sunday midnight
