@@ -1,286 +1,270 @@
-# 🚀 快速开始指南
+# Quick Start Guide
 
-欢迎使用 **AI Agent 团队**！本指南帮助你在 5 分钟内开始使用。
-
----
-
-## 📦 安装
-
-### 方式 1: 通过 ClawHub（推荐）
-
-```bash
-# 安装完整技能包
-openclaw skill install agency-agents
-
-# 验证安装
-openclaw skill list
-```
-
-### 方式 2: 手动安装
-
-```bash
-# Clone 仓库
-git clone https://github.com/your-repo/agency-agents-openclaw.git
-
-# 复制到技能目录
-cp -r agency-agents-openclaw ~/.openclaw/skills/
-
-# 重启 OpenClaw
-openclaw restart
-```
+Get Automate running in 5 minutes. This guide covers the three main ways to use the platform.
 
 ---
 
-## 🎯 第一次使用
+## Prerequisites
 
-### 示例 1: 使用单个 Agent
+- A GitHub repository (this one: `automate-nbm`)
+- Git and Bash (for local scripts)
+- Optional: `OPENCLAW_TOKEN` secret for AI-powered execution
+- Optional: `AUTOMATE_SSH_KEY` secret for secure operations
+
+## Setup
+
+### 0. Clone the Repo
 
 ```bash
-# 前端开发
-/openclaw skill use agency-agents --agent frontend-developer "帮我创建一个 React 登录页面，包含邮箱、密码输入框，需要表单验证和错误提示"
-
-# 增长策略
-/openclaw skill use agency-agents --agent growth-hacker "为我的 SaaS 产品制定一个 3 个月增长计划，目标是从 1000 用户到 10000 用户"
-
-# 项目管理
-/openclaw skill use agency-agents --agent senior-project-manager "帮我把这个需求分解成具体的开发任务：创建一个电商网站"
+git clone git@github.com:ironiclawdoctor-design/automate-nbm.git
+cd automate-nbm
 ```
 
-### 示例 2: 使用 Agent 编排器
+### 1. Configure GitHub Secrets
+
+Go to **Settings → Secrets and variables → Actions** and add:
+
+| Secret | Purpose | Required |
+|--------|---------|----------|
+| `OPENCLAW_TOKEN` | AI-powered agent execution | Recommended |
+| `AUTOMATE_SSH_KEY` | SSH back to host server | Optional |
+| `ALLOWED_SENDERS` | Whitelist for `repository_dispatch` | Optional |
+
+### 2. Verify Setup
 
 ```bash
-# 完整项目开发
-/openclaw skill use agency-agents --agent orchestrator "帮我开发一个完整的博客系统，包括：
-- 前端：React + Tailwind CSS
-- 后端：Node.js + Express
-- 数据库：PostgreSQL
-- 功能：用户注册登录、文章发布、评论、标签分类"
+# Validate configuration and agent files
+make validate
 
-# 营销活动
-/openclaw skill use agency-agents --agent orchestrator "为我的新产品发布策划一次完整的营销活动，包括社交媒体、内容营销和 PR"
-```
+# List all available agents
+make list-agents
 
-### 示例 3: 使用整个部门
-
-```bash
-# 工程部门协作
-/openclaw skill use agency-agents --department engineering "开发一个完整的 Web 应用，包括前端和后端"
-
-# 市场部门协作
-/openclaw skill use agency-agents --department marketing "制定并执行一个季度的营销计划"
+# Run the test suite
+make test
 ```
 
 ---
 
-## 💡 常用场景
+## Method 1: GitHub Issues (Recommended)
 
-### 场景 1: 创业公司 MVP
+The simplest way. Create an issue, the system does the rest.
+
+### Submit an Agent Task
+
+0. Go to **Issues → New Issue → Agent Task** template
+1. Fill in the agent name and task description
+2. Submit — the workflow auto-dispatches and posts results as comments
+
+**Example issue:**
+
+```
+Title: [AGENT] Design a REST API for user management
+
+Agent: backend-architect
+Department: engineering
+
+## Task Description
+Design a REST API for a user management system. Requirements:
+- User CRUD operations
+- Authentication (JWT)
+- Role-based access control (admin, user, viewer)
+- Rate limiting
+- PostgreSQL database schema
+
+## Expected Deliverables
+- OpenAPI spec
+- Database schema (SQL)
+- Authentication flow diagram
+```
+
+### What Happens
+
+0. **Acknowledge** — Bot comments "Task received, assigned to backend-architect"
+1. **Dispatch** — Task is routed to the agent via `scripts/agent-dispatch.sh`
+2. **Execute** — Agent processes the task (AI-powered if `OPENCLAW_TOKEN` is set)
+3. **Report** — Results are posted as an issue comment
+4. **Label** — Issue gets labeled `completed`
+
+### Trigger Orchestration
+
+For complex multi-agent projects, add the `orchestrate` label:
+
+```
+Title: [ORCHESTRATE] Build an e-commerce MVP
+
+## Task Description
+Build a minimum viable e-commerce site:
+- Product catalog with search and filtering
+- Shopping cart and checkout flow
+- User authentication
+- Admin dashboard for inventory management
+- Tech stack: React + Node.js + PostgreSQL
+
+## Expected Deliverables
+- Frontend components
+- API design
+- Database schema
+- Deployment configuration
+```
+
+The orchestrator will decompose this into tasks, assign agents, run QA loops, and deliver integrated results.
+
+---
+
+## Method 2: CLI Scripts (Local)
+
+Run agents directly from the command line.
+
+### Run a Single Agent
 
 ```bash
-# 使用编排器自动调度
-/openclaw skill use agency-agents --agent orchestrator "帮我快速开发一个 MVP，验证我的创业想法：一个面向自由职业者的时间追踪应用"
+# Syntax
+./scripts/run-task.sh <agent-name> "<task-description>"
 
-# 或手动选择 Agent
-# 1. 前端开发
-/openclaw skill use agency-agents --agent frontend-developer "创建响应式时间追踪界面"
-
-# 2. 后端架构
-/openclaw skill use agency-agents --agent backend-architect "设计用户、项目、时间条目的数据模型和 API"
-
-# 3. 增长策略
-/openclaw skill use agency-agents --agent growth-hacker "制定早期用户获取策略"
+# Examples
+./scripts/run-task.sh frontend-developer "Create a responsive navigation component using React and Tailwind CSS"
+./scripts/run-task.sh backend-architect "Design a PostgreSQL schema for a multi-tenant SaaS application"
+./scripts/run-task.sh growth-hacker "Create a 90-day growth plan targeting 10K MAU for a developer tool"
+./scripts/run-task.sh reality-checker "Assess production readiness for the v2.0 release"
+./scripts/run-task.sh senior-pm "Break down this project into sprint-sized tasks: build a mobile banking app"
 ```
 
-### 场景 2: 网站重构
+### Auto-Dispatch (Keyword Detection)
+
+Let the system pick the right agent based on task keywords:
 
 ```bash
-/openclaw skill use agency-agents --agent orchestrator "重构我们的公司网站：
-- 当前：老式 PHP 网站
-- 目标：现代 React + 头 CMS
-- 要求：保持 SEO、提升性能、移动优先"
+# The dispatch script analyzes keywords and routes automatically
+TASK_BODY="Build a React dashboard with real-time charts" ./scripts/agent-dispatch.sh
+# → Auto-detects: frontend-developer
+
+TASK_BODY="Set up a Kubernetes deployment with auto-scaling" ./scripts/agent-dispatch.sh
+# → Auto-detects: devops-automator
+
+TASK_BODY="Design a user onboarding flow that increases activation by 20%" ./scripts/agent-dispatch.sh
+# → Auto-detects: growth-hacker
 ```
 
-### 场景 3: 数据分析报告
+### Department Routing
 
 ```bash
-/openclaw skill use agency-agents --agent data-analytics-reporter "分析我们的销售数据，生成月度报告，包括：
-- 销售趋势
-- 产品线表现
-- 地区分析
-- 下月预测"
+# Route to best agent in a department
+DEPARTMENT=engineering TASK_BODY="Optimize database queries" ./scripts/agent-dispatch.sh
+
+# Orchestration mode
+ORCHESTRATE=true TASK_BODY="Build a complete blog platform" ./scripts/agent-dispatch.sh
 ```
 
----
-
-## 🎭 可用 Agent 快速参考
-
-### 💻 工程部
-| Agent | 用途 | 命令 |
-|-------|------|------|
-| 前端开发 | React/Vue/Angular 开发 | `frontend-developer` |
-| 后端架构 | API/数据库设计 | `backend-architect` |
-| 移动端 | iOS/Android开发 | `mobile-app-builder` |
-| AI 工程 | ML/AI集成 | `ai-engineer` |
-| DevOps | CI/CD/基础设施 | `devops-automator` |
-
-### 📢 市场部
-| Agent | 用途 | 命令 |
-|-------|------|------|
-| 增长黑客 | 用户获取/转化 | `growth-hacker` |
-| 内容创作 | 多平台内容 | `content-creator` |
-| 社交媒体 | 社交策略 | `social-media-strategist` |
-| TikTok | 短视频策略 | `tiktok-strategist` |
-
-### 🎬 项目管理
-| Agent | 用途 | 命令 |
-|-------|------|------|
-| 高级 PM | 任务分解/规划 | `senior-project-manager` |
-| 项目协调 | 跨职能协调 | `project-shepherd` |
-| 实验追踪 | A/B 测试 | `experiment-tracker` |
-
-### 🧪 测试部
-| Agent | 用途 | 命令 |
-|-------|------|------|
-| 现实检查 | 质量认证 | `reality-checker` |
-| 证据收集 | 截图 QA | `evidence-collector` |
-| 性能测试 | 性能基准 | `performance-benchmarker` |
-
----
-
-## 📊 最佳实践
-
-### 1. 清晰的任务描述
-
-❌ **模糊**:
-```
-"帮我做个网站"
-```
-
-✅ **清晰**:
-```
-"帮我创建一个电商网站的前端，使用 React + Tailwind CSS，需要包含：
-- 首页（展示热门商品）
-- 商品列表页（带筛选和排序）
-- 商品详情页
-- 购物车页面
-- 结账流程
-要求：响应式设计，支持移动端，无障碍合规"
-```
-
-### 2. 提供上下文
-
-```
-"我的产品是一个面向小企业的 SaaS 记账工具，目标用户是没有会计背景的店主。
-请帮我设计一个 onboarding 流程，让他们能在 5 分钟内完成初始设置并开始使用。"
-```
-
-### 3. 迭代优化
-
-```
-# 第一轮
-"帮我写一个登录页面"
-
-# 第二轮（基于输出反馈）
-"很好！现在添加以下功能：
-1. 社交登录（Google、微信）
-2. 记住我功能
-3. 密码强度指示器"
-
-# 第三轮
-"再优化一下移动端体验，按钮太小了"
-```
-
-### 4. 多 Agent 验证
-
-```
-# 开发完成后，让测试 Agent 验证
-/openclaw skill use agency-agents --agent reality-checker "审查这个登录页面的实现质量"
-
-# 让 UX Agent 提供建议
-/openclaw skill use agency-agents --agent ux-researcher "从 UX 角度审查这个登录流程"
-```
-
----
-
-## ⚙️ 配置选项
-
-### 环境变量
+### Send Notifications
 
 ```bash
-# 设置默认部门（可选）
-export AGENCY_AGENTS_DEFAULT_DEPARTMENT=engineering
+# Console
+./scripts/notify.sh info "Task started" console
 
-# 设置质量检查严格度 1-5（默认 3）
-export AGENCY_AGENTS_QA_LEVEL=4
+# GitHub issue comment
+GITHUB_TOKEN=xxx GITHUB_REPOSITORY=owner/repo ISSUE_NUMBER=42 \
+  ./scripts/notify.sh success "Task completed!" github
 
-# 启用详细日志（可选）
-export AGENCY_AGENTS_VERBOSE=true
-```
-
-### 技能配置
-
-在 `~/.openclaw/skills/agency-agents-openclaw/config.json` 中：
-
-```json
-{
-  "defaultAgent": "frontend-developer",
-  "qaLevel": 3,
-  "maxRetries": 3,
-  "timeout": 3600,
-  "verbose": false
-}
+# Webhook
+WEBHOOK_URL=https://hooks.example.com/notify \
+  ./scripts/notify.sh error "Build failed" webhook
 ```
 
 ---
 
-## 🆘 常见问题
+## Method 3: Workflow Dispatch (Manual Trigger)
 
-### Q: 安装后找不到技能？
-A: 运行 `openclaw skill list` 确认安装成功，然后重启 OpenClaw。
+Trigger workflows directly from the GitHub Actions UI.
 
-### Q: Agent 输出不符合预期？
-A: 
-1. 提供更详细的任务描述
-2. 提供示例和参考
-3. 明确技术栈和要求
-4. 使用迭代方式优化
+0. Go to **Actions** tab
+1. Select a workflow:
+   - **Agent Task Runner** — single agent task
+   - **Orchestrator Pipeline** — multi-agent project
+   - **Scheduled Automation** — manual trigger of scheduled tasks
+2. Click **Run workflow**
+3. Fill in the inputs (agent name, task description, QA level)
+4. Watch the run and check results
 
-### Q: 如何切换 Agent？
-A: 直接在新命令中指定不同 Agent 即可：
-```bash
-/openclaw skill use agency-agents --agent growth-hacker "..."
+---
+
+## Writing Good Task Descriptions
+
+The quality of agent output depends heavily on task description quality.
+
+### ❌ Too Vague
+```
+Build a website
 ```
 
-### Q: 多 Agent 如何协作？
-A: 使用编排器自动调度，或手动依次调用不同 Agent。
+### ✅ Good
+```
+Build a responsive landing page for a SaaS product:
+- Hero section with headline, subheading, and CTA button
+- Feature grid (3 features with icons)
+- Pricing table (3 tiers)
+- FAQ accordion
+- Footer with links and newsletter signup
 
-### Q: 如何保存 Agent 输出？
-A: Agent 会自动保存输出到工作区，路径：`~/clawd/agency-agents/[日期]/[项目名]/`
-
----
-
-## 📚 进阶资源
-
-- [完整 Agent 列表](./agents-list.md)
-- [使用指南](./usage-guide.md)
-- [最佳实践](./best-practices.md)
-- [API 参考](./api-reference.md)
-- [示例项目](../examples/)
-
----
-
-## 💬 获取帮助
-
-- 📧 Email: support@your-company.com
-- 💬 Discord: 加入社区
-- 📚 文档：https://docs.your-company.com
-
----
-
-**准备好开始了吗？** 试试第一个命令：
-
-```bash
-/openclaw skill use agency-agents --agent frontend-developer "帮我创建一个简单的 React 计数器组件"
+Tech: React + Tailwind CSS
+Target: Desktop and mobile (320px+)
+Constraints: Must score 90+ on Lighthouse performance
 ```
 
-🎉 祝你使用愉快！
+### Tips
+- **Be specific** about tech stack, constraints, and deliverables
+- **Provide context** — what's the product? who are the users?
+- **Define "done"** — what does the output look like?
+- **Include examples** or references when possible
+
+---
+
+## Configuration
+
+All configuration lives in `config/automate.yml`. Key settings:
+
+```yaml
+# Agent selection strictness
+orchestrator:
+  qa_level: 2          # 0=quick, 4=production-grade
+
+# Task limits
+tasks:
+  max_concurrent: 3
+  timeout_minutes: 30
+
+# Notification targets
+notifications:
+  targets: [console, github]
+```
+
+See the full config file for all options.
+
+---
+
+## Troubleshooting
+
+### Issue created but no response
+- Check that the issue has the `task` or `agent-task` label
+- Verify workflows are enabled: **Settings → Actions → General**
+- Check workflow run logs in the **Actions** tab
+
+### Agent not found
+- See [AGENTS.md](../AGENTS.md) for the full list of agent names
+- Names are case-sensitive and use kebab-case: `frontend-developer`, not `Frontend Developer`
+
+### "Basic mode" — no AI processing
+- Set the `OPENCLAW_TOKEN` secret in **Settings → Secrets**
+- Without it, tasks are recorded but not AI-processed
+
+### Workflow syntax errors
+- Run `make validate` to check all workflow files
+- Use [actionlint](https://github.com/rhysd/actionlint) for detailed validation
+
+---
+
+## Next Steps
+
+- Browse the [Agent Registry](../AGENTS.md) to see all 61 agents
+- Read agent profiles in `agents/` for capability details
+- Check the [Orchestrator docs](../orchestrator/SKILL.md) for multi-agent pipelines
+- Review `config/automate.yml` to customize settings

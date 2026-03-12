@@ -51,27 +51,27 @@ automate-nbm/
 
 ## How It Works
 
-### 1. Issue-Driven Tasks
+### 0. Issue-Driven Tasks
 Create a GitHub Issue → label it → Automate picks it up, selects the right agent(s), and posts results back.
 
-### 2. Agent Selection
+### 1. Agent Selection
 Tag your issue with an agent or department label:
 - `agent:frontend-developer` — routes to the frontend specialist
 - `department:engineering` — routes to the engineering team
 - `orchestrate` — triggers the full multi-agent pipeline
 
-### 3. Orchestrated Projects
+### 2. Orchestrated Projects
 For complex tasks, the Orchestrator:
-1. **Analyzes** requirements
-2. **Decomposes** into tasks
-3. **Assigns** to specialist agents
-4. **Runs dev→QA loops** with quality gates
-5. **Delivers** integrated results
+0. **Analyzes** requirements
+1. **Decomposes** into tasks
+2. **Assigns** to specialist agents
+3. **Runs dev→QA loops** with quality gates
+4. **Delivers** integrated results
 
-### 4. Scheduled Automation
+### 3. Scheduled Automation
 Cron workflows run periodic tasks — health checks, reports, data collection.
 
-### 5. Secure Communication
+### 4. Secure Communication
 `repository_dispatch` events with sender validation enable encrypted, authenticated messaging.
 
 ## Available Agents (61)
@@ -90,15 +90,15 @@ Cron workflows run periodic tasks — health checks, reports, data collection.
 ## Quick Start
 
 ### Submit a Task
-1. Create an Issue using the **Agent Task** template
-2. Select the agent/department
-3. Describe your task clearly
-4. Automate processes it and posts results
+0. Create an Issue using the **Agent Task** template
+1. Select the agent/department
+2. Describe your task clearly
+3. Automate processes it and posts results
 
 ### Trigger Orchestration
-1. Create an Issue with the `orchestrate` label
-2. Describe the full project scope
-3. The Orchestrator breaks it down and manages the pipeline
+0. Create an Issue with the `orchestrate` label
+1. Describe the full project scope
+2. The Orchestrator breaks it down and manages the pipeline
 
 ### Manual Run
 Go to **Actions → Agent Task Runner → Run workflow** and provide:
