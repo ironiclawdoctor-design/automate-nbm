@@ -1,22 +1,51 @@
 # Automate Agent Configuration
 # ================================
+# Integrated AI Agency + Task Automation
 
 agent:
   name: Automate
-  version: 1.0.0
-  description: Persistent subagent for secure task automation
+  version: 2.0.0
+  description: AI Agent Agency + GitHub-native task automation
+
+# Agency — 61 agents across 8 departments
+agency:
+  departments:
+    engineering:
+      agents: [frontend-developer, backend-architect, mobile-app-builder, ai-engineer, devops-automator, rapid-prototyper, senior-developer]
+    design:
+      agents: [ui-designer, ux-researcher, ux-architect, brand-guardian, visual-storyteller, whimsy-injector, image-prompt-engineer]
+    marketing:
+      agents: [growth-hacker, content-creator, twitter-engager, tiktok-strategist, instagram-curator, reddit-community-builder, app-store-optimizer, social-media-strategist]
+    product:
+      agents: [sprint-prioritizer, trend-researcher, feedback-synthesizer]
+    project-management:
+      agents: [studio-producer, project-shepherd, studio-operations, experiment-tracker, senior-pm]
+    testing:
+      agents: [evidence-collector, reality-checker, test-results-analyzer, performance-benchmarker, api-tester, tool-evaluator, workflow-optimizer]
+    support:
+      agents: [support-responder, analytics-reporter, finance-tracker, infrastructure-maintainer, legal-compliance-checker, executive-summary-generator]
+    specialized:
+      agents: [orchestrator, data-analytics-reporter, lsp-index-engineer, sales-data-extraction-agent, data-consolidation-agent, report-distribution-agent]
+
+# Orchestrator settings
+orchestrator:
+  qa_level: 3           # Quality check strictness (1-5)
+  max_retries: 3        # Max retries per task before escalation
+  timeout_minutes: 60   # Max time per task
+  auto_advance: true    # Auto-advance on QA pass
+  verbose: false        # Detailed logging
 
 # Communication channels
 channels:
   github:
     enabled: true
-    issue_labels: [task, automation]
+    issue_labels: [task, agent-task, orchestrate]
     auto_acknowledge: true
-  
+
   webhook:
     enabled: false
     url: ""  # Set via WEBHOOK_URL secret
-  
+
   ssh:
     enabled: true
     # Key managed via GitHub Secrets (AUTOMATE_SSH_KEY)
@@ -26,7 +55,7 @@ tasks:
   max_concurrent: 3
   timeout_minutes: 30
   auto_close_completed: false
-  
+
   priorities:
     high:
       label: "priority:high"
@@ -43,7 +72,7 @@ security:
   require_sender_validation: true
   # ALLOWED_SENDERS set via GitHub Secrets
   audit_log: true
-  
+
 # Schedule (for scheduled.yml)
 schedule:
   health_check: "0 */6 * * *"    # Every 6 hours

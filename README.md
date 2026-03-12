@@ -1,72 +1,129 @@
-# Automate
+# Automate — AI Agent Agency + Task Automation
 
-A persistent subagent for secure task automation, orchestrated via GitHub.
+A persistent subagent system combining **61 specialized AI agents** across 8 departments with **GitHub-native secure task automation**.
 
 ## What Is This?
 
-**Automate** is a GitHub-native task delegation system. It uses GitHub Issues, Actions, and encrypted secrets to securely receive, execute, and report on automated tasks.
+**Automate** is a private, self-contained AI agency and task automation platform. It fuses:
+
+- 🤖 **Agency Agents** — 61 specialized AI agent personas (engineering, design, marketing, product, PM, testing, support, specialized)
+- 🔄 **Orchestrator** — Multi-agent pipeline that breaks down complex projects and delegates to specialists
+- ⚡ **GitHub Actions Automation** — Issue-driven task execution, scheduled jobs, and secure communication
+- 🔒 **Security-First** — SSH keys, encrypted secrets, sender validation, full audit trail
+
+## Architecture
+
+```
+automate-nbm/
+├── .github/
+│   ├── workflows/
+│   │   ├── agent-task.yml          # AI agent-powered task processing
+│   │   ├── orchestrator.yml        # Multi-agent orchestration pipeline
+│   │   ├── task-runner.yml         # Basic task execution on issues
+│   │   ├── scheduled.yml           # Cron-based automation
+│   │   └── secure-comm.yml         # Encrypted message relay
+│   └── ISSUE_TEMPLATE/
+│       ├── task.md                 # Generic task template
+│       └── agent-task.md           # Agent-specific task template
+├── agents/                         # 61 AI Agent definitions
+│   ├── engineering/                # 7 agents: frontend, backend, mobile, AI, devops...
+│   ├── design/                     # 7 agents: UI, UX, brand, visual...
+│   ├── marketing/                  # 8 agents: growth, content, social...
+│   ├── product/                    # 3 agents: sprint, trends, feedback
+│   ├── project-management/         # 5 agents: PM, shepherd, ops...
+│   ├── testing/                    # 7 agents: QA, reality-checker, perf...
+│   ├── support/                    # 6 agents: support, analytics, finance...
+│   └── specialized/                # 6 agents: orchestrator, data, LSP...
+├── orchestrator/
+│   └── SKILL.md                    # Multi-agent orchestration engine
+├── scripts/
+│   ├── run-task.sh                 # Task executor
+│   ├── agent-dispatch.sh           # Agent selection + dispatch
+│   └── notify.sh                   # Notification helper
+├── config/
+│   └── automate.yml                # Agent + automation config
+├── docs/
+│   └── QUICKSTART.md               # Getting started guide
+├── SKILL.md                        # OpenClaw skill definition
+├── AGENTS.md                       # Agent registry & quick reference
+└── package.json                    # Metadata
+```
 
 ## How It Works
 
-1. **Create an Issue** → Automate picks it up as a task
-2. **GitHub Actions** runs the automation workflow
-3. **Results posted** back to the issue as comments
-4. **Secure comms** via GitHub's encrypted secrets and SSH
+### 1. Issue-Driven Tasks
+Create a GitHub Issue → label it → Automate picks it up, selects the right agent(s), and posts results back.
 
-## Security Model
+### 2. Agent Selection
+Tag your issue with an agent or department label:
+- `agent:frontend-developer` — routes to the frontend specialist
+- `department:engineering` — routes to the engineering team
+- `orchestrate` — triggers the full multi-agent pipeline
 
-- All secrets stored in GitHub Encrypted Secrets (never in code)
-- SSH key authentication (no passwords)
-- Workflow permissions scoped to minimum required
-- Audit trail via GitHub's native logging
-- Branch protection available for approval gates
+### 3. Orchestrated Projects
+For complex tasks, the Orchestrator:
+1. **Analyzes** requirements
+2. **Decomposes** into tasks
+3. **Assigns** to specialist agents
+4. **Runs dev→QA loops** with quality gates
+5. **Delivers** integrated results
 
-## Task Types
+### 4. Scheduled Automation
+Cron workflows run periodic tasks — health checks, reports, data collection.
 
-- 🔍 **Research** — web lookups, data gathering
-- 📁 **File Operations** — generate, transform, organize
-- 🔄 **Automation** — scheduled tasks via cron workflows
-- 📊 **Reports** — compile and post summaries
-- 🔗 **Integration** — bridge between services
+### 5. Secure Communication
+`repository_dispatch` events with sender validation enable encrypted, authenticated messaging.
 
-## Usage
+## Available Agents (61)
 
-### Quick Task
-```
-Create a new issue with your task description.
-Label it: `task`, `priority:high|medium|low`
-```
+| Department | Count | Key Agents |
+|---|---|---|
+| 💻 Engineering | 7 | frontend-developer, backend-architect, mobile-app-builder, ai-engineer, devops-automator, rapid-prototyper, senior-developer |
+| 🎨 Design | 7 | ui-designer, ux-researcher, ux-architect, brand-guardian, visual-storyteller, whimsy-injector, image-prompt-engineer |
+| 📢 Marketing | 8 | growth-hacker, content-creator, twitter-engager, tiktok-strategist, instagram-curator, reddit-community-builder, app-store-optimizer, social-media-strategist |
+| 📊 Product | 3 | sprint-prioritizer, trend-researcher, feedback-synthesizer |
+| 🎬 Project Mgmt | 5 | studio-producer, project-shepherd, studio-operations, experiment-tracker, senior-pm |
+| 🧪 Testing | 7 | evidence-collector, reality-checker, test-results-analyzer, performance-benchmarker, api-tester, tool-evaluator, workflow-optimizer |
+| 🛟 Support | 6 | support-responder, analytics-reporter, finance-tracker, infrastructure-maintainer, legal-compliance-checker, executive-summary-generator |
+| 🎯 Specialized | 6 | orchestrator, data-analytics-reporter, lsp-index-engineer, sales-data-extraction, data-consolidation, report-distribution |
 
-### Scheduled Task
-```
-Edit .github/workflows/scheduled.yml with your cron expression.
-```
+## Quick Start
 
-### Secure Data
-```
-Add secrets via: Settings → Secrets and Variables → Actions
-Reference in workflows as: ${{ secrets.YOUR_SECRET }}
-```
+### Submit a Task
+1. Create an Issue using the **Agent Task** template
+2. Select the agent/department
+3. Describe your task clearly
+4. Automate processes it and posts results
 
-## Structure
+### Trigger Orchestration
+1. Create an Issue with the `orchestrate` label
+2. Describe the full project scope
+3. The Orchestrator breaks it down and manages the pipeline
 
-```
-automate/
-├── .github/
-│   ├── workflows/
-│   │   ├── task-runner.yml      # Triggered by new issues
-│   │   ├── scheduled.yml        # Cron-based automation
-│   │   └── secure-comm.yml      # Encrypted message relay
-│   └── ISSUE_TEMPLATE/
-│       └── task.md              # Task submission template
-├── scripts/
-│   ├── run-task.sh              # Main task executor
-│   └── notify.sh                # Notification helper
-├── config/
-│   └── automate.yml             # Agent configuration
-└── README.md
-```
+### Manual Run
+Go to **Actions → Agent Task Runner → Run workflow** and provide:
+- Agent name
+- Task description
+
+## Security
+
+| Layer | Method |
+|---|---|
+| Authentication | SSH ed25519 keys |
+| Secrets | GitHub Encrypted Secrets |
+| Communication | `repository_dispatch` with sender validation |
+| Audit | GitHub Actions logs + issue comments |
+| Permissions | Minimum-scope workflow tokens |
+
+### Required Secrets
+| Secret | Purpose |
+|---|---|
+| `OPENCLAW_TOKEN` | AI-powered task processing |
+| `AUTOMATE_SSH_KEY` | SSH back to host server |
+| `ALLOWED_SENDERS` | Whitelist for secure-comm |
 
 ## License
 
-Private — for authorized use only.
+Private — authorized use only.
+
+Based on [agency-agents](https://github.com/msitarzewski/agency-agents) by @msitarzewski (MIT).

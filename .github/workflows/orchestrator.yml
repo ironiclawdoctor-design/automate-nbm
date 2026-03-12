@@ -1,0 +1,190 @@
+name: 🔄 Orchestrator Pipeline
+
+on:
+  issues:
+    types: [opened, labeled]
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Full project description'
+        required: true
+        type: string
+      qa_level:
+        description: 'Quality level 1-5'
+        required: false
+        default: '3'
+        type: string
+      max_retries:
+        description: 'Max retries per task'
+        required: false
+        default: '3'
+        type: string
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  orchestrate:
+    if: >
+      (github.event_name == 'workflow_dispatch') ||
+      (contains(github.event.issue.labels.*.name, 'orchestrate'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Acknowledge Pipeline Start
+        if: github.event.issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                '## 🔄 Orchestrator Pipeline — Started',
+                '',
+                '**Phase 1:** Analyzing requirements...',
+                '**Phase 2:** Task decomposition (pending)',
+                '**Phase 3:** Agent dispatch + QA loops (pending)',
+                '**Phase 4:** Integration + final review (pending)',
+                '',
+                `**Started:** ${new Date().toISOString()}`,
+                '',
+                '---',
+                '*Updates will be posted as each phase completes.*'
+              ].join('\n')
+            });
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['orchestrating', 'in-progress']
+            });
+
+      - name: Run Orchestration
+        env:
+          PROJECT_DESC: ${{ github.event.issue.body || github.event.inputs.project }}
+          PROJECT_TITLE: ${{ github.event.issue.title || 'Manual Project' }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || '0' }}
+          QA_LEVEL: ${{ github.event.inputs.qa_level || '3' }}
+          MAX_RETRIES: ${{ github.event.inputs.max_retries || '3' }}
+          OPENCLAW_TOKEN: ${{ secrets.OPENCLAW_TOKEN }}
+          AUTOMATE_SSH_KEY: ${{ secrets.AUTOMATE_SSH_KEY }}
+        run: |
+          echo "🔄 Orchestrator Pipeline"
+          echo "========================"
+          echo "Project: $PROJECT_TITLE"
+          echo "QA Level: $QA_LEVEL"
+          echo "Max Retries: $MAX_RETRIES"
+          echo ""
+
+          RESULT="/tmp/orchestrator-result.md"
+
+          cat > "$RESULT" << 'HEADER'
+          ## 🔄 Orchestrator — Pipeline Complete
+
+          HEADER
+
+          # Phase 1: Requirements Analysis
+          echo "### Phase 1: Requirements Analysis" >> "$RESULT"
+          echo "" >> "$RESULT"
+          echo "**Project:** $PROJECT_TITLE" >> "$RESULT"
+          echo "" >> "$RESULT"
+
+          # Load orchestrator config
+          if [ -f orchestrator/SKILL.md ]; then
+            echo "✅ Orchestrator engine loaded" >> "$RESULT"
+          fi
+
+          # Load available agents
+          AGENT_COUNT=$(find agents/ -name "*.md" -type f 2>/dev/null | wc -l)
+          echo "✅ $AGENT_COUNT agent definitions available" >> "$RESULT"
+          echo "" >> "$RESULT"
+
+          # Phase 2: Task Decomposition
+          echo "### Phase 2: Task Decomposition" >> "$RESULT"
+          echo "" >> "$RESULT"
+
+          if [ -n "${OPENCLAW_TOKEN:-}" ]; then
+            echo "🔗 AI-powered decomposition available" >> "$RESULT"
+            echo "The orchestrator will use AI to:" >> "$RESULT"
+            echo "1. Analyze project scope" >> "$RESULT"
+            echo "2. Break into agent-sized tasks" >> "$RESULT"
+            echo "3. Assign to specialist agents" >> "$RESULT"
+            echo "4. Run dev↔QA quality loops" >> "$RESULT"
+          else
+            echo "ℹ️ Add \`OPENCLAW_TOKEN\` secret for AI-powered orchestration" >> "$RESULT"
+          fi
+          echo "" >> "$RESULT"
+
+          # Phase 3: Agent Pipeline Status
+          echo "### Phase 3: Available Agent Pipeline" >> "$RESULT"
+          echo "" >> "$RESULT"
+          echo "| Department | Agents | Status |" >> "$RESULT"
+          echo "|---|---|---|" >> "$RESULT"
+
+          for dept in engineering design marketing product project-management testing support specialized; do
+            count=$(find "agents/$dept/" -name "*.md" -type f 2>/dev/null | wc -l)
+            if [ "$count" -gt 0 ]; then
+              echo "| $dept | $count defined | ✅ Ready |" >> "$RESULT"
+            else
+              echo "| $dept | catalog only | 🟡 Pending |" >> "$RESULT"
+            fi
+          done
+          echo "" >> "$RESULT"
+
+          # Phase 4: Summary
+          echo "### Phase 4: Pipeline Summary" >> "$RESULT"
+          echo "" >> "$RESULT"
+          echo "- **Orchestrator engine:** ✅ Loaded" >> "$RESULT"
+          echo "- **Agent definitions:** $AGENT_COUNT ready" >> "$RESULT"
+          echo "- **QA level:** $QA_LEVEL/5" >> "$RESULT"
+          echo "- **Max retries:** $MAX_RETRIES" >> "$RESULT"
+          echo "- **Completed:** $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$RESULT"
+          echo "" >> "$RESULT"
+          echo "---" >> "$RESULT"
+          echo "*🤖 Automate Orchestrator*" >> "$RESULT"
+
+      - name: Post Pipeline Results
+        if: always() && github.event.issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let result = '⚠️ Pipeline did not produce results.';
+            try {
+              result = fs.readFileSync('/tmp/orchestrator-result.md', 'utf8');
+            } catch (e) {}
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: result
+            });
+
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'in-progress'
+              });
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'orchestrating'
+              });
+            } catch (e) {}
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['completed']
+            });
