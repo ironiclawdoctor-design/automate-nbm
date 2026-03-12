@@ -36,6 +36,10 @@ assignees: ''
 - **Existing code/repo:**
 - **Other context:**
 
+## Expected Output
+
+<!-- What should the agent deliver? (code, docs, analysis, etc.) -->
+
 ## Expected Deliverables
 
 <!-- What should the output be? Check all that apply and add specifics. -->
